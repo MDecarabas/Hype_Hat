@@ -14,7 +14,7 @@
 static const nrfx_pwm_t PWM_INST = NRFX_PWM_INSTANCE(0);
 
 // Holds duty cycle values to trigger PWM toggle
-nrf_pwm_values_common_t sequence_data[8] = {0};
+nrf_pwm_values_common_t sequence_data[8] = {1 << 15};
 
 // Sequence structure for configuring DMA
 nrf_pwm_sequence_t pwm_sequence = {
