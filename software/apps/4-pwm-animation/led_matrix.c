@@ -1,4 +1,4 @@
-// PWM LED Matrix
+// LED MATRIX
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -9,6 +9,7 @@
 #include "nrfx_pwm.h"
 
 #include "microbit_v2.h"
+#include "led_matrix.h"
 
 #define SEQUENCE_SIZE 6224
 #define DATA_SIZE 6144
@@ -20,29 +21,43 @@
 static const nrfx_pwm_t PWM_INST = NRFX_PWM_INSTANCE(0);
 
 // Holds duty cycle values to trigger PWM toggle
-nrf_pwm_values_common_t sequence_data[SEQUENCE_SIZE] = {0};
+static nrf_pwm_values_common_t sequence_data[SEQUENCE_SIZE] = {0};
+
 
 // Sequence structure for configuring DMA
-nrf_pwm_sequence_t pwm_sequence = {
+static nrf_pwm_sequence_t pwm_sequence = {
   .values.p_common = sequence_data,
   .length = SEQUENCE_SIZE,
   .repeats = 0,
   .end_delay = 0,
 };
 
-static int get_led_num(int row, int col) {
+
+// Convert LED at (row, col) to corresponding LED index
+int get_led_num(int row, int col) {
+  
+  // int num;
+  // if (col % 2 == 0) {
+  //   num = (col-1) * 8 + (row-1);
+  // } else {
+  //   num = (col-1) * 8 + (7 - (row - 1));
+  // }
+  // return num;
+
   int num;
   if (col % 2 == 0) {
-    num = (col-1) * 8 + (row-1);
+    num = (31 - (col - 1)) * 8 + (7 - (row - 1));
   } else {
-    num = (col-1) * 8 + (7 - (row - 1));
+    num = (31 - (col - 1)) * 8 + (row - 1);
   }
   return num;
+
 }
 
-// Sets the RGB value for some give LED in the matrix
-// led_num must be less than SEQUENCE_SIZE - 80 (80 is the trailing buffer)
-static void set_data(int led_num, unsigned char r, unsigned char g, unsigned char b) {
+
+// Set the RGB value for some given LED in the matrix
+// led_num must be less than DATA_SIZE 
+void set_data(int led_num, unsigned char r, unsigned char g, unsigned char b) {
 
   // Set the green values
   sequence_data[led_num*24] = !(0b10000000 & g)? (6 + (1 << 15)): (13 + (1 << 15));
@@ -76,7 +91,9 @@ static void set_data(int led_num, unsigned char r, unsigned char g, unsigned cha
 
 }
 
-static void pwm_init(void) {
+
+// Initializes the PWM driver
+void pwm_init(void) {
 
   // Initialize sequence_data to 1 << 15
   // This sets compare to 0 and polarity to falling edge
@@ -101,7 +118,9 @@ static void pwm_init(void) {
   nrfx_pwm_init(&PWM_INST, &pwm_config, NULL);
 }
 
-static void play_pwm() {
+
+// Send PWM signals to LED matrix
+void play_pwm() {
 
   // Stop the PWM (and wait until its finished)
   nrfx_pwm_stop(&PWM_INST, true);
@@ -111,7 +130,9 @@ static void play_pwm() {
 
 }
 
-static void debug_matrix() {
+
+// Print LEDs being lit up on the matrix
+void debug_matrix() {
 
   // Declare variables needed to print the matrix
   char led_row[33];
@@ -133,39 +154,10 @@ static void debug_matrix() {
           break;
         }
       }
-      led_row[32-col] = curr;
+      led_row[col-1] = curr;
     }
     printf("%s\n", led_row);
   }
   printf("End of Matrix\n\n");
-
-}
-
-int main(void) {
-
-  printf("Board started!\n");
-
-  // initialize PWM
-  pwm_init();
-
-  // start pwm
-  play_pwm();
-
-  while (true) {
-    
-    // set custom led
-    for (int i = 0; i <= 32; i++) {
-      set_data(get_led_num(1, i), 14, 0, 20);
-      set_data(get_led_num(8, i), 0, 0, 0);
-    }
-    nrf_delay_ms(1000);
-
-    for (int i = 0; i <= 32; i++) {
-      set_data(get_led_num(1, i), 0, 0, 0);
-      set_data(get_led_num(8, i), 14, 0, 20);
-    }
-    nrf_delay_ms(1000);
-
-  }
 
 }
