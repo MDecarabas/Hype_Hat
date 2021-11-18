@@ -36,14 +36,6 @@ static nrf_pwm_sequence_t pwm_sequence = {
 // Convert LED at (row, col) to corresponding LED index
 int get_led_num(int row, int col) {
   
-  // int num;
-  // if (col % 2 == 0) {
-  //   num = (col-1) * 8 + (row-1);
-  // } else {
-  //   num = (col-1) * 8 + (7 - (row - 1));
-  // }
-  // return num;
-
   int num;
   if (col % 2 == 0) {
     num = (31 - (col - 1)) * 8 + (7 - (row - 1));
@@ -88,6 +80,23 @@ void set_data(int led_num, unsigned char r, unsigned char g, unsigned char b) {
   sequence_data[led_num*24 + 21] = !(0b00000100 & b)? (6 + (1 << 15)): (13 + (1 << 15));
   sequence_data[led_num*24 + 22] = !(0b00000010 & b)? (6 + (1 << 15)): (13 + (1 << 15));
   sequence_data[led_num*24 + 23] = !(0b00000001 & b)? (6 + (1 << 15)): (13 + (1 << 15));
+
+}
+
+
+// Clear LED matrix
+void clear_matrix() {
+
+  // Stop the PWM (and wait until its finished)
+  nrfx_pwm_stop(&PWM_INST, true);
+
+  // Set all bits to low
+  for (int i = 0; i < DATA_SIZE; i++) {
+    sequence_data[i] = LOW_BIT;
+  }
+
+  // Play samples one
+  nrfx_pwm_simple_playback(&PWM_INST, &pwm_sequence, 1, 0);
 
 }
 
@@ -161,3 +170,4 @@ void debug_matrix() {
   printf("End of Matrix\n\n");
 
 }
+

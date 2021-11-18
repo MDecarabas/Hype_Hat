@@ -79,6 +79,9 @@ void stop_text() {
     // Stop timer
     app_timer_stop(my_timer);
 
+    // Clear LED matrix
+    clear_matrix();
+
 }
 
 
@@ -107,5 +110,6 @@ void next_frame_text() {
     }
 
     // Print what the LED matrix should like 
-    debug_matrix();
+    // debug_matrix();
+    
 }

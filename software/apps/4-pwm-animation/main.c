@@ -28,6 +28,12 @@ int main(void) {
   // Start animating text
   play_text(0, 20, 20, 20, 0.05);
 
+  // Delay for 10 seconds
+  nrf_delay_ms(10000);
+
+  // End animation
+  stop_text();
+
   while (true) {
     
     nrf_delay_ms(1000);

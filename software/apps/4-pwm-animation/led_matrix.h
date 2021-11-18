@@ -5,6 +5,9 @@ int get_led_num(int row, int col);
 // led_num must be less than DATA_SIZE 
 void set_data(int led_num, unsigned char r, unsigned char g, unsigned char b);
 
+// Clear LED matrix; turn it off
+void clear_matrix();
+
 // Initializes the PWM driver
 void pwm_init(void);
 
