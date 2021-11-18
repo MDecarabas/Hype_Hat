@@ -55,7 +55,7 @@ void set_text(int text_num, char* text_string, uint8_t text_length) {
 }
 
 
-void play_text(int text_num, unsigned char r, unsigned char g, unsigned char b) {
+void play_text(int text_num, unsigned char r, unsigned char g, unsigned char b, float freq) {
     
     // Display parameters
     display_column_start = -1;
@@ -69,7 +69,15 @@ void play_text(int text_num, unsigned char r, unsigned char g, unsigned char b) 
     app_timer_create(&my_timer, APP_TIMER_MODE_REPEATED, next_frame_text);
 
     // Start app timer (move frame every 0.2 seconds)
-    app_timer_start(my_timer, 6555, NULL);
+    app_timer_start(my_timer, 32786 * freq, NULL);
+
+}
+
+
+void stop_text() {
+
+    // Stop timer
+    app_timer_stop(my_timer);
 
 }
 

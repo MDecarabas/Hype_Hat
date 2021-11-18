@@ -23,10 +23,10 @@ int main(void) {
   play_pwm();
 
   // Set display text
-  set_text(0, "Boom", 4);
+  set_text(0, "Hello, welcome to CE346!", 24);
 
   // Start animating text
-  play_text(0, 20, 20, 20);
+  play_text(0, 20, 20, 20, 0.05);
 
   while (true) {
     
