@@ -10,7 +10,7 @@
 
 #include "microbit_v2.h"
 #include "led_matrix.h"
-#include "led_animate.h"
+#include "led_text.h"
 
 int main(void) {
 
@@ -27,6 +27,9 @@ int main(void) {
 
   // Start animating text
   play_text(0, 20, 20, 20, 0.05);
+
+  // Set brightness
+  set_brightness_text(0.5);
 
   // Delay for 10 seconds
   nrf_delay_ms(10000);
