@@ -24,15 +24,23 @@ int main(void) {
 
   // Set display text
   set_text(0, "Hello, welcome to CE346!", 24);
+  set_text(1, "HYPE HAT!", 9);
+  set_text(2, "How does a computer get drunk...It takes screenshots!   ", 53);
 
   // Start animating text
-  play_text(0, 20, 20, 20, 0.05);
+  play_text(1, 40, 40, 40, 0.05);
 
-  // Set brightness
-  set_brightness_text(0.5);
+  // Set brightness sequence
+  float brightness_settings[] = {1, 0.7, 0.45, 0.3, 0.2};
+  for (int i = 0; i < 5; i++) {
 
-  // Delay for 10 seconds
-  nrf_delay_ms(10000);
+    // Set brightness
+    set_brightness_text(0.2 * brightness_settings[i]);
+
+    // Delay for 2 seconds
+    nrf_delay_ms(2000);
+
+  }
 
   // End animation
   stop_text();
