@@ -26,7 +26,7 @@ int main(void) {
   i2c_config.frequency = NRF_TWIM_FREQ_100K;
   i2c_config.interrupt_priority = 0;
   nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
-
+  i2c_light_init(&twi_mngr_instance);
   app_timer_init();
   app_timer_create(&my_timer_1, APP_TIMER_MODE_REPEATED, read_light);
   app_timer_start(my_timer_1, 32768, NULL);
