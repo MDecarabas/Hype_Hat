@@ -25,10 +25,10 @@ int main(void) {
   // Set display text
   set_text(0, "Hello, welcome to CE346!", 24);
   set_text(1, "HYPE HAT!", 9);
-  set_text(2, "How does a computer get drunk...It takes screenshots!   ", 53);
+  set_text(2, "Boom Boom Pow", 13);
 
   // Start animating text
-  play_text(1, 40, 40, 40, 0.05);
+  play_text(2, 40, 40, 40, 0.05);
 
   // Set brightness sequence
   float brightness_settings[] = {1, 0.7, 0.45, 0.3, 0.2};
