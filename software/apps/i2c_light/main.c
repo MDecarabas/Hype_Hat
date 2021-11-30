@@ -41,8 +41,7 @@ int main(void) {
   // Loop forever
   while (1) {
     // Don't put any code in here. Instead put periodic code in a callback using a timer.
-    //nrf_delay_ms(1000);
-    //read_light();
+    nrf_delay_ms(1000);
   }
 }
 

@@ -21,10 +21,11 @@ void light_init(const nrf_twi_mngr_t* i2c) {
 
   // ---Initialize Light Sensor---
   // set the light sensor to continuous H-Resolution Mode
+  uint8_t init = 0x10;
   nrf_twi_mngr_transfer_t const initial_transfer[] = {
-    NRF_TWI_MNGR_WRITE(LIGHT_ADDRESS, 0x10, 1, 0)
+    NRF_TWI_MNGR_WRITE(LIGHT_ADDRESS, &init, 1, 0)
   };
-  nrf_twi_mngr_perform(i2c_manager, NULL, initial_transfer, 1, NULL);
+  nrf_twi_mngr_perform(i2c_manager, NULL, initial_transfer, 2, NULL);
   nrf_delay_ms(200); // needs time to update
 }
 
