@@ -24,9 +24,11 @@
 static const nrfx_pwm_t PWM_INST = NRFX_PWM_INSTANCE(0);
 
 // Sample data configurations
-#define SAMPLING_FREQUENCY 1000 // 16 kHz sampling rate
-#define BUFFER_SIZE 1000 // 1 second of data
+#define SAMPLING_FREQUENCY 16000 // 16 kHz sampling rate
+#define BUFFER_SIZE 16000 // 1 second of data
 uint16_t samples[BUFFER_SIZE] = {0}; // stores ADC samples and PWM duty cycle values
+uint32_t amplitudeAverage = 0;
+
 volatile bool samples_complete = false; // flag for blocking while sampling
 
 
@@ -64,25 +66,17 @@ static void saadc_event_callback(nrfx_saadc_evt_t const* event) {
     average = average/BUFFER_SIZE;
 
     uint32_t amplitudeTotal = 0;
-    uint32_t amplitudeAverage = 0;
 
     // scale each sample based on the average value and recenter around 50%
     for (int i=0; i<BUFFER_SIZE; i++) {
       // scaling determined experimentally by Branden Ghena
       samples[i] = (((int32_t)samples[i] - average) * 10) + (ADC_MAX_COUNTS/2);
-      // printf("%d\n", samples[i]);
 
       amplitudeTotal += samples[i];
-      printf("%d\n", amplitudeTotal);
-
     }
+
       amplitudeAverage = amplitudeTotal/BUFFER_SIZE;
-      // printf("total\n");
-      // printf("%d\n", amplitudeTotal);
-      // printf("Buffer\n");
-      // printf("%d\n", BUFFER_SIZE);
-      printf("Average\n");
-      printf("%d\n", amplitudeAverage);
+      // printf("%d\n", amplitudeAverage);
     // Signal completion
     samples_complete = true;
 
@@ -150,6 +144,19 @@ static void sample_microphone(void) {
   NRF_TIMER4->CC[0] = TIMER_TICKS; // 16 kHZ
 }
 
+void sample_microphone_scaled(void) {
+uint16_t min;
+uint16_t max;
+uint8_t scaled;
+
+max = 8200; //Min value of sound amplitude 
+min = 7800; //Max value of sound amplitude
+
+scaled = (uint8_t)((amplitudeAverage-min)/(max-min)*100); //Scaled valued of sound amplitude from 0-100
+
+printf("%d\n", scaled);
+}
+
 int main(void) {
   printf("Board started!\n");
 
@@ -169,4 +176,6 @@ int main(void) {
   while (!samples_complete) {
     nrf_delay_ms(100);
   }
+  sample_microphone_scaled();
+
 }
