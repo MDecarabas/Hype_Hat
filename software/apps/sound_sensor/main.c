@@ -30,7 +30,7 @@ static const nrfx_pwm_t PWM_INST = NRFX_PWM_INSTANCE(0);
 // Sample data configurations
 // Note: this is a 62.5 kB buffer (almost half of RAM)
 #define SAMPLING_FREQUENCY 1000 // 16 kHz sampling rate
-#define BUFFER_SIZE 1000 // two seconds worth of data
+#define BUFFER_SIZE 1000 // 1 second of data
 uint16_t samples[BUFFER_SIZE] = {0}; // stores ADC samples and PWM duty cycle values
 volatile bool samples_complete = false; // flag for blocking while sampling
 
@@ -162,26 +162,12 @@ static void pwm_init(void) {
   nrfx_pwm_init(&PWM_INST, &pwm_cfg, NULL);
 }
 
-static void play_audio_samples_looped(void) {
+static void audio_samples_duty_cycle(void) {
   // Recalculate each sample as a duty cycle based on countertop
   // Each sample should be modified in place
   for(int i = 0; i < BUFFER_SIZE; i++) {
       samples[i] = (samples[i] / (float)ADC_MAX_COUNTS) * pwm_cfg.top_value;
   }
-
-  // Create the pwm sequence (nrf_pwm_sequence_t) using the samples
-  // Do not make another buffer for this. You can reuse the sample buffer
-  // You should set a non-zero repeat value (note that will affect frequency)
-  // Sequence structure for configuring DMA
-  nrf_pwm_sequence_t pwm_sequence = {
-    .values.p_common = samples,
-    .length = BUFFER_SIZE,
-    .repeats = 2,
-    .end_delay = 0,
-  };
-
-  // Start playback of the samples and loop indefinitely
-  nrfx_pwm_simple_playback(&PWM_INST, &pwm_sequence, 1, NRFX_PWM_FLAG_STOP);
 }
 
 
@@ -203,17 +189,9 @@ int main(void) {
   // Sample audio from the microphone
   sample_microphone();
 
-
   // Delay until sampling the ADC is complete
   while (!samples_complete) {
     nrf_delay_ms(100);
-  }
-
-  // Play audio over the speaker
-  play_audio_samples_looped();
-
-  while (true) {
-    nrf_delay_ms(1000);
   }
 }
 
