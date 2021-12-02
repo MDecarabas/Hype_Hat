@@ -178,5 +178,5 @@ int main(void) {
     nrf_delay_ms(100);
   }
 
-  sample_microphone_scaled();
+  sample_microphone_scaled(); //This is the one that returns values 0-100
 }
