@@ -31,7 +31,7 @@ void light_init(const nrf_twi_mngr_t* i2c) {
 
 // Read the external light sensor
 //
-// Return measurement as floating point value in lux
+// Return measurement as floating point value in lux then normalize from 0-100
 float read_light(void) {
 
   uint16_t rx_buf = 0;
@@ -40,7 +40,12 @@ float read_light(void) {
   };
   nrf_twi_mngr_perform(i2c_manager, NULL, read_transfer, 1, NULL);
   float light_read = (float) rx_buf;
-  printf("Light: %f\n\n", light_read);
+  printf("Light: %f lux \n", light_read);
+
+  // Normalize (Max value is ~64k, standard overhead light ~22k)
+  light_read = light_read*100.0/66000.0;
+  printf("Normalized: %f\n\n", light_read);
+
 
   return light_read;
 }
