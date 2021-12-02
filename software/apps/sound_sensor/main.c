@@ -1,7 +1,3 @@
-// Record and Play App
-//
-// Record audio using the microphone, ADC, and timer
-// Play back that audio using the speaker and PWM
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,7 +24,6 @@
 static const nrfx_pwm_t PWM_INST = NRFX_PWM_INSTANCE(0);
 
 // Sample data configurations
-// Note: this is a 62.5 kB buffer (almost half of RAM)
 #define SAMPLING_FREQUENCY 1000 // 16 kHz sampling rate
 #define BUFFER_SIZE 1000 // 1 second of data
 uint16_t samples[BUFFER_SIZE] = {0}; // stores ADC samples and PWM duty cycle values
@@ -36,7 +31,6 @@ volatile bool samples_complete = false; // flag for blocking while sampling
 
 
 void TIMER4_IRQHandler(void) {
-  // Needs to be quick! No printf here!!
 
   // Clear the event
   NRF_TIMER4->EVENTS_COMPARE[0] = 0;
@@ -71,7 +65,7 @@ static void saadc_event_callback(nrfx_saadc_evt_t const* event) {
 
     // scale each sample based on the average value and recenter around 50%
     for (int i=0; i<BUFFER_SIZE; i++) {
-      // scaling determined experimentally
+      // scaling determined experimentally by Branden Ghena
       samples[i] = (((int32_t)samples[i] - average) * 10) + (ADC_MAX_COUNTS/2);
       printf("%d\n",samples[i]);
     }
@@ -106,8 +100,7 @@ static void adc_init(void) {
   nrfx_saadc_init(&saadc_config, saadc_event_callback);
 
   // Initialize the microphone ADC channel
-  // It's a small signal we're sampling quickly, so max out gain and minimize
-  //    acquisition time
+  // small signal sampled quickly, max out gain and minimize acquisition time
   nrf_saadc_channel_config_t mic_channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(ANALOG_MIC_IN);
   mic_channel_config.gain = NRF_SAADC_GAIN4;
   mic_channel_config.acq_time = NRF_SAADC_ACQTIME_3US;
@@ -129,7 +122,6 @@ static void timer_init(void) {
   NVIC_ClearPendingIRQ(TIMER4_IRQn);
   NVIC_SetPriority(TIMER4_IRQn, 7); // lowest priority
   NVIC_EnableIRQ(TIMER4_IRQn);
-
 }
 
 static void sample_microphone(void) {
@@ -145,32 +137,6 @@ static void sample_microphone(void) {
   NRF_TIMER4->CC[0] = TIMER_TICKS; // 16 kHZ
 }
 
-nrfx_pwm_config_t pwm_cfg = {
-  .output_pins = {SPEAKER_OUT, NRFX_PWM_PIN_NOT_USED, NRFX_PWM_PIN_NOT_USED, NRFX_PWM_PIN_NOT_USED},
-  .base_clock = NRF_PWM_CLK_16MHz,
-  .count_mode = NRF_PWM_MODE_UP,
-  .load_mode = NRF_PWM_LOAD_COMMON,
-  .top_value = (16000000 / SAMPLING_FREQUENCY) / 3,
-  .step_mode = NRF_PWM_STEP_AUTO,
-};
-
-static void pwm_init(void) {
-  // Initialize the PWM
-  // SPEAKER_OUT is the output pin, mark the others as NRFX_PWM_PIN_NOT_USED
-  // Set the clock to 16 MHz
-  // Set a countertop value based on sampling frequency and repetitions
-  nrfx_pwm_init(&PWM_INST, &pwm_cfg, NULL);
-}
-
-static void audio_samples_duty_cycle(void) {
-  // Recalculate each sample as a duty cycle based on countertop
-  // Each sample should be modified in place
-  for(int i = 0; i < BUFFER_SIZE; i++) {
-      samples[i] = (samples[i] / (float)ADC_MAX_COUNTS) * pwm_cfg.top_value;
-  }
-}
-
-
 int main(void) {
   printf("Board started!\n");
 
@@ -183,9 +149,6 @@ int main(void) {
   // Initialize timer
   timer_init();
 
-  // Initialize the PWM
-  pwm_init();
-
   // Sample audio from the microphone
   sample_microphone();
 
@@ -194,4 +157,3 @@ int main(void) {
     nrf_delay_ms(100);
   }
 }
-
