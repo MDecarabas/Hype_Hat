@@ -63,6 +63,7 @@ static void saadc_event_callback(nrfx_saadc_evt_t const* event) {
     for (int i=0; i<BUFFER_SIZE; i++) {
       average += (uint16_t)samples[i];
     }
+
     average = average/BUFFER_SIZE;
 
     uint32_t amplitudeTotal = 0;
@@ -176,6 +177,6 @@ int main(void) {
   while (!samples_complete) {
     nrf_delay_ms(100);
   }
-  sample_microphone_scaled();
 
+  sample_microphone_scaled();
 }
