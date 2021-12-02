@@ -63,13 +63,26 @@ static void saadc_event_callback(nrfx_saadc_evt_t const* event) {
     }
     average = average/BUFFER_SIZE;
 
+    uint32_t amplitudeTotal = 0;
+    uint32_t amplitudeAverage = 0;
+
     // scale each sample based on the average value and recenter around 50%
     for (int i=0; i<BUFFER_SIZE; i++) {
       // scaling determined experimentally by Branden Ghena
       samples[i] = (((int32_t)samples[i] - average) * 10) + (ADC_MAX_COUNTS/2);
-      printf("%d\n",samples[i]);
-    }
+      // printf("%d\n", samples[i]);
 
+      amplitudeTotal += samples[i];
+      printf("%d\n", amplitudeTotal);
+
+    }
+      amplitudeAverage = amplitudeTotal/BUFFER_SIZE;
+      // printf("total\n");
+      // printf("%d\n", amplitudeTotal);
+      // printf("Buffer\n");
+      // printf("%d\n", BUFFER_SIZE);
+      printf("Average\n");
+      printf("%d\n", amplitudeAverage);
     // Signal completion
     samples_complete = true;
 
