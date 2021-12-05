@@ -24,9 +24,12 @@ static void gpio_handler_btn_A(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t acti
 }
 
 
-// Change color based on microphone reading
+// Change color based on microphone reading - from quiet = green to loud = red
 static void gpio_handler_btn_B(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  change_color(30, 30, 30);
+  int sound_reading = 80;
+  uint8_t red = 60 * ((float) sound_reading / 100.0);
+  uint8_t green = 60 * (1.0 - ((float) sound_reading / 100.0));
+  change_color(red, green, 0);
 }
 
 
