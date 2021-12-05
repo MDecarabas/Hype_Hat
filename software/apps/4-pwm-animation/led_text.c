@@ -25,9 +25,6 @@ static uint8_t texts[3][101][8] = {0};
 // Track length of scrolling text
 static uint8_t lengths[3] = {0};
 
-// Store color information of the text
-static uint8_t colors[3][3] = {0};
-
 // Current display window
 static int display_column_start;
 static int display_text_num;
@@ -37,15 +34,10 @@ static unsigned char display_text_blue;
 static float brightness_text;
 
 
-void set_text(int text_num, char* text_string, uint8_t text_length, unsigned char r, unsigned char g, unsigned char b) {
+void set_text(int text_num, char* text_string, uint8_t text_length) {
     
     // Set text length
     lengths[text_num] = text_length;
-
-    // Set text color
-    colors[text_num][0] = r;
-    colors[text_num][1] = g;
-    colors[text_num][2] = b;
 
     // Store text in texts buffer
     for (int i = 0; i < text_length; i++) {
@@ -65,15 +57,15 @@ void set_text(int text_num, char* text_string, uint8_t text_length, unsigned cha
 }
 
 
-void play_text(int text_num,  float freq) {
+void play_text(int text_num, unsigned char r, unsigned char g, unsigned char b, float freq) {
     
     // Display parameters
     display_column_start = -1;
     display_text_num = text_num;
+    display_text_red = r;
+    display_text_green = g;
+    display_text_blue = b;
     brightness_text = 1;
-    display_text_red = colors[text_num][0];
-    display_text_green = colors[text_num][1];
-    display_text_blue = colors[text_num][2];
     
     // Initialize and create timer
     app_timer_init();
@@ -81,9 +73,6 @@ void play_text(int text_num,  float freq) {
 
     // Start app timer (move frame every 0.2 seconds)
     app_timer_start(my_timer, 32786 * freq, NULL);
-
-    // Start sending PWM pulses to LED matrix
-    play_pwm();
 
 }
 
@@ -129,27 +118,8 @@ void next_frame_text() {
 }
 
 
-// Set brightness of the text
-void set_brightness_text(int brightness) {
-    if (brightness <= 100 && brightness_text >= 0) {
-        brightness_text = ((float)brightness)/100;
+void set_brightness_text(float brightness) {
+    if (brightness <= 1) {
+        brightness_text = brightness;
     }
-}
-
-
-// Cycle through preset texts
-void cycle_text() {
-    display_text_num = (display_text_num + 1) % 3;
-    display_column_start = -1;
-    display_text_red = colors[display_text_num][0];
-    display_text_green = colors[display_text_num][1];
-    display_text_blue = colors[display_text_num][2];
-}
-
-
-// Temporarily change current color
-void change_color(unsigned char r, unsigned char g, unsigned char b) {
-    display_text_red = r;
-    display_text_green = g;
-    display_text_blue = b;
 }

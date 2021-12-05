@@ -104,7 +104,7 @@ void clear_matrix() {
 // Initializes the PWM driver
 void pwm_init(void) {
 
-  // Initialize sequence_data to 1 << 15
+  // Initialize sequence_data to LOW_BIT and buffer space to 1 << 15
   // This sets compare to 0 and polarity to falling edge
   for (int i = 0; i < DATA_SIZE; i++) {
     sequence_data[i] = LOW_BIT;
@@ -136,6 +136,14 @@ void play_pwm() {
 
   // Start playback of the samples and loop indefinitely
   nrfx_pwm_simple_playback(&PWM_INST, &pwm_sequence, 1, NRFX_PWM_FLAG_LOOP);
+
+}
+
+
+void stop_pwm() {
+
+  // Stop the PWM (and wait until its finished)
+  nrfx_pwm_stop(&PWM_INST, true);
 
 }
 

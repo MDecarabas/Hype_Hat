@@ -14,5 +14,8 @@ void pwm_init(void);
 // Send PWM signals to LED matrix
 void play_pwm();
 
+// Stop sending PWM signals
+void stop_pwm();
+
 // Print LEDs being lit up on the matrix
 void debug_matrix();
