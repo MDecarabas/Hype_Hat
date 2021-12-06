@@ -16,6 +16,7 @@
 #include "led_matrix.h"
 #include "led_text.h"
 #include "light.h"
+#include "sound.h"
 
 
 // Change text on button pressed
@@ -26,7 +27,7 @@ static void gpio_handler_btn_A(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t acti
 
 // Change color based on microphone reading - from quiet = green to loud = red
 static void gpio_handler_btn_B(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  int sound_reading = 80;
+  int sound_reading = read_sound();
   uint8_t red = 60 * ((float) sound_reading / 100.0);
   uint8_t green = 60 * (1.0 - ((float) sound_reading / 100.0));
   change_color(red, green, 0);
@@ -59,6 +60,9 @@ void init() {
 
   // Initalize light sensor and i2c peripheral
   light_sensor_init();
+
+  // Initialize sound sensor
+  sound_init();
 
   // Initialize PWM driver with configuration specific for the LED matrix
   pwm_init();
@@ -93,7 +97,7 @@ int main(void) {
       set_brightness_text(brightness);
     }
     nrf_delay_ms(100);
-    printf("%f\n", read_light());
+    printf("Light Reading: %f\n", read_light());
   }
 
 }
