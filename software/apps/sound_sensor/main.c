@@ -145,7 +145,7 @@ static void sample_microphone(void) {
   NRF_TIMER4->CC[0] = TIMER_TICKS; // 16 kHZ
 }
 
-void sample_microphone_scaled(void) {
+int read_sound(void) {
 uint16_t min;
 uint16_t max;
 uint8_t scaled;
@@ -156,12 +156,12 @@ min = 7800; //Max value of sound amplitude
 scaled = (uint8_t)((amplitudeAverage-min)/(max-min)*100); //Scaled valued of sound amplitude from 0-100
 
 printf("%d\n", scaled);
+return scaled;
+
 }
 
-int main(void) {
-  printf("Board started!\n");
-
-  // Initialize GPIO
+void sound_init(void){
+ // Initialize GPIO
   gpio_init();
 
   // Initialize ADC
@@ -177,6 +177,14 @@ int main(void) {
   while (!samples_complete) {
     nrf_delay_ms(100);
   }
+}
 
-  sample_microphone_scaled(); //This is the one that returns values 0-100
+int main(void) {
+  
+  printf("Board started!\n");
+
+  sound_init(); //Initializes all neccesary function to read sound
+
+  read_sound(); //Returns values 0-100 according to amplitude of sound
+
 }
