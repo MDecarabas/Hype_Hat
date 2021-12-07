@@ -149,7 +149,7 @@ static void sample_microphone(void) {
 static int get_sound(void) {
   
   int min = 8000;
-  int max = 10000;
+  int max = 35000;
   int scaled;
   
   if (amplitudeAverage < min) {

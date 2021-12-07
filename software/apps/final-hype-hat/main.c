@@ -81,12 +81,12 @@ int main(void) {
   init();
 
   //TODO: SET PRESET TEXTS
-  set_text(0, "Hello, welcome to CE346!", 24, 60, 0, 0);
-  set_text(1, "HYPE HAT!", 9, 0, 60, 0);
-  set_text(2, "Boom Boom Pow", 13, 0, 0, 60);
+  set_text(0, "GO U, NU!", 9, 30, 2, 60);
+  set_text(1, "Finals suck!", 12, 60, 0, 60);
+  set_text(2, "Hi Branden!", 13, 18, 128, 64);
 
   // Start animating text
-  play_text(1, 0.05);
+  play_text(0, 0.05);
 
   while (true) {
     int brightness = read_light();
